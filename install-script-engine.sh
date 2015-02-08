@@ -75,7 +75,7 @@ function install_node() {
   source $HOME/.nvm/nvm.sh || die "Failed to load NVM"
   nvm install "$1" || die "Failed to install Node.js '$1'"
   nvm alias default "$1" || die "Failed to set Node.js '$1' as default version"
-  add_to_path $(nvm which default)
+  add_to_path $(dirname $(nvm which default))/*
 }
 
 function install_debian() {
