@@ -53,6 +53,7 @@ function add_to_path() {
 }
 
 function install_ruby() {
+  local version="$1"
   [ -x "$GPG" ] || die "Missing gpg"
   [ -x "$CURL" ] || die "Missing curl"
   if ! ($GPG --list-keys | grep -q D39DC0E3); then
@@ -64,8 +65,9 @@ function install_ruby() {
     $CURL -sL https://get.rvm.io | bash -s stable || die "Failed to install RVM"
   fi
   source /etc/profile.d/rvm.sh
-  rvm install "$1" || die "Failed to install Ruby '$1'"
-  rvm use "$1" default || die "Failed to set Ruby '$1' to default"
+  rvm list strings | egrep -q "ruby-$version" && return 0
+  rvm install "$1" || die "Failed to install Ruby '$version'"
+  rvm use "$1" default || die "Failed to set Ruby '$version' to default"
   add_to_path $(rvm_base_dir)/wrappers/default/*
 }
 
@@ -79,16 +81,25 @@ function install_node() {
 }
 
 function install_debian() {
-  [ -n "$ruby" ] && { install_ruby "$ruby" || die "Failed to install ruby"; }
-  [ -n "$node" ] && { install_node "$node" || die "Failed to install node.js"; }
+  for engine in "${INSTALL_SCRIPT_ENGINES[@]}"; do
+    IFS=- read name version <<<"$engine"
+    install_$name "$version" || die "Failed to install ruby"
+  done
+  true
 }
 
 source /etc/lsb-release
 
 [ -x "$AWK" ] || die "Missing awk"
 
-ruby="$($AWK -F= '$1=="ruby"{print$2}' < .versions.conf)"
-node="$($AWK -F= '$1=="node"{print$2}' < .versions.conf)"
+SUPPORTED_SCRIPT_ENGINES=( ruby node )
+INSTALL_SCRIPT_ENGINES=()
+
+for engine in "${SUPPORTED_SCRIPT_ENGINES[@]}"; do
+  version="$($AWK -F= '$1=="'"$engine"'"{print$2}' < .versions.conf)"
+  [ -z "$version" ] && continue
+  INSTALL_SCRIPT_ENGINES+=( "${engine}-${version}" )
+done
 
 case $DISTRIB_ID in
 (Ubuntu) install_debian;;
