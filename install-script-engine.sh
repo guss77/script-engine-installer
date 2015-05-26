@@ -33,6 +33,10 @@ function rvm_base_dir() {
   fi
 }
 
+function un_ansi() {
+  sed -e 's/\o33\[[0-9]\+m//g'
+}
+
 function bin_dir() {
   if [ "$(id -u)" != "0" ]; then
     for path in $(echo $PATH | tr ':' ' '); do
@@ -73,11 +77,13 @@ function install_ruby() {
 
 function install_node() {
   [ -x "$CURL" ] || die "Missing curl"
-  curl -sL https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash || die "Failed to install NVM"
-  source $HOME/.nvm/nvm.sh || die "Failed to load NVM"
-  nvm install "$1" || die "Failed to install Node.js '$1'"
-  nvm alias default "$1" || die "Failed to set Node.js '$1' as default version"
-  add_to_path $(dirname $(nvm which default))/*
+  (
+    curl -sL https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash || die "Failed to install NVM"
+    source $HOME/.nvm/nvm.sh || die "Failed to load NVM"
+    nvm install "$1" || die "Failed to install Node.js '$1'"
+    nvm alias default "$1" || die "Failed to set Node.js '$1' as default version"
+    add_to_path $(dirname $(nvm which default))/*
+  ) | un_ansi
 }
 
 function install_debian() {
