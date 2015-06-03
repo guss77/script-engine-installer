@@ -67,10 +67,10 @@ function install_ruby() {
     $(rvm_base_dir)/bin/rvm-shell -c 'rvm get stable'
   else
     $CURL -sL https://get.rvm.io | bash -s stable || die "Failed to install RVM"
-  fi
+  fi | un_ansi
   source /etc/profile.d/rvm.sh
   rvm list strings | egrep -q "ruby-$version" && return 0
-  rvm install "$1" || die "Failed to install Ruby '$version'"
+  rvm install "$1" > >(un_ansi) 2>*1 || die "Failed to install Ruby '$version'"
   rvm use "$1" default || die "Failed to set Ruby '$version' to default"
   add_to_path $(rvm_base_dir)/wrappers/default/*
 }
