@@ -37,6 +37,12 @@ function un_ansi() {
   sed -e 's/\o33\[[0-9]\+m//g'
 }
 
+function all_ok() { 
+  for v in "$@"; do 
+    [ "$v" == 0 ] || return 1
+  done
+}
+
 function bin_dir() {
   if [ "$(id -u)" != "0" ]; then
     for path in $(echo $PATH | tr ':' ' '); do
@@ -66,7 +72,8 @@ function install_ruby() {
   if [ -d "$(rvm_base_dir)" ]; then
     $(rvm_base_dir)/bin/rvm-shell -c 'rvm get stable'
   else
-    $CURL -sL https://get.rvm.io | bash -s stable || die "Failed to install RVM"
+    $CURL -sL https://get.rvm.io | bash -s stable
+    all_ok "${PIPESTATUS[@]}" || die "Failed to install RVM"
   fi | un_ansi
   source /etc/profile.d/rvm.sh
   rvm list strings | egrep -q "ruby-$version" && return 0
