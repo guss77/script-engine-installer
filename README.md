@@ -18,4 +18,12 @@ Currently supported operating systems:
 
 # Usage
 
+While technically, you can curl|sh like this:
+
 `curl https://raw.githubusercontent.com/guss77/script-engine-installer/master/install-script-engine.sh | bash`
+
+Plaese don't do that because I'm not trustworthy, and while I guarantee you that today this script will not eat your harddrive, I make no such guarantees about the future. Instead:
+
+1. download the release tarball
+2. open the tarball and inspect the main script
+3. If you think it works for you, put it somewhere in your path, chmod 755 it, and run it where you have a .versions.conf
