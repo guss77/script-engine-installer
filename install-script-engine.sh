@@ -103,10 +103,11 @@ function install_debian() {
 
 source /etc/lsb-release
 
-[ -x "$AWK" ] || die "Missing awk"
-
 SUPPORTED_SCRIPT_ENGINES=( ruby node )
 INSTALL_SCRIPT_ENGINES=()
+
+[ -f .versions.conf ] || die "Please provide a valid .versions.conf"
+[ -x "$AWK" ] || die "Missing awk"
 
 for engine in "${SUPPORTED_SCRIPT_ENGINES[@]}"; do
   version="$($AWK -F= '$1=="'"$engine"'"{print$2}' < .versions.conf)"
