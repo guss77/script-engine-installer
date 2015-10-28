@@ -26,8 +26,8 @@ function die() {
 }
 
 function rvm_base_dir() {
-  if [ -n "$INSTALL_LOCAL" ]; then
-    pwd
+  if [ -n "$INSTALL_CWD" ]; then
+    echo "$(pwd)/.rvm"
   elif [ "$(id -u)" == "0" ]; then
     echo "/usr/local/rvm"
   else
@@ -74,7 +74,7 @@ function install_ruby() {
   if [ -d "$(rvm_base_dir)" ]; then
     $(rvm_base_dir)/bin/rvm-shell -c 'rvm get stable'
   else
-    $CURL -sL https://get.rvm.io | bash -s stable
+    $CURL -sL https://get.rvm.io | bash --path "$(rvm_base_dir)" -s stable
     all_ok "${PIPESTATUS[@]}" || die "Failed to install RVM"
   fi | un_ansi
   source /etc/profile.d/rvm.sh
@@ -86,6 +86,7 @@ function install_ruby() {
 
 function install_node() {
   [ -x "$CURL" ] || die "Missing curl"
+  [ -n "$INSTALL_CWD"] && export NVM_DIR="$(pwd)/.nvm"
   (
     curl -sL https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash || die "Failed to install NVM"
     source $HOME/.nvm/nvm.sh || die "Failed to load NVM"
@@ -114,7 +115,7 @@ INSTALL_SCRIPT_ENGINES=()
 while [ -n "$1" ]; do
     while getopts l opt; do
       case "$opt" in
-      l) INSTALL_LOCAL=1;;
+      l) INSTALL_CWD=1;;
       esac
     done
     shift $((OPTIND-1))
