@@ -26,7 +26,9 @@ function die() {
 }
 
 function rvm_base_dir() {
-  if [ "$(id -u)" == "0" ]; then
+  if [ -n "$INSTALL_LOCAL" ]; then
+    pwd
+  elif [ "$(id -u)" == "0" ]; then
     echo "/usr/local/rvm"
   else
     echo "$HOME/.rvm"
@@ -108,6 +110,15 @@ INSTALL_SCRIPT_ENGINES=()
 
 [ -f .versions.conf ] || die "Please provide a valid .versions.conf"
 [ -x "$AWK" ] || die "Missing awk"
+
+while [ -n "$1" ]; do
+    while getopts l opt; do
+      case "$opt" in
+      l) INSTALL_LOCAL=1;;
+      esac
+    done
+    shift $((OPTIND-1))
+done
 
 for engine in "${SUPPORTED_SCRIPT_ENGINES[@]}"; do
   version="$($AWK -F= '$1=="'"$engine"'"{print$2}' < .versions.conf)"
