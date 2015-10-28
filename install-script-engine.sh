@@ -74,7 +74,7 @@ function install_ruby() {
   if [ -d "$(rvm_base_dir)" ]; then
     $(rvm_base_dir)/bin/rvm-shell -c 'rvm get stable'
   else
-    $CURL -sL https://get.rvm.io | bash --path "$(rvm_base_dir)" -s stable
+    $CURL -sL https://get.rvm.io | bash -s --path "$(rvm_base_dir)" stable
     all_ok "${PIPESTATUS[@]}" || die "Failed to install RVM"
   fi | un_ansi
   source /etc/profile.d/rvm.sh
