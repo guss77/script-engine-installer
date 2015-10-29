@@ -86,7 +86,7 @@ function install_ruby() {
 
 function install_node() {
   [ -x "$CURL" ] || die "Missing curl"
-  [ -n "$INSTALL_CWD"] && export NVM_DIR="$(pwd)/.nvm"
+  [ -n "$INSTALL_CWD" ] && export NVM_DIR="$(pwd)/.nvm"
   (
     curl -sL https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash || die "Failed to install NVM"
     source $HOME/.nvm/nvm.sh || die "Failed to load NVM"
