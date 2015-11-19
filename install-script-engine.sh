@@ -77,7 +77,11 @@ function install_ruby() {
     $CURL -sL https://get.rvm.io | bash -s -- --path "$(rvm_base_dir)" stable
     all_ok "${PIPESTATUS[@]}" || die "Failed to install RVM"
   fi | un_ansi
-  source /etc/profile.d/rvm.sh
+  if [ -n "$INSTALL_CWD" ]; then
+    source .rvm/scripts/rvm
+  else
+    source /etc/profile.d/rvm.sh
+  fi
   rvm list strings | egrep -q "ruby-$version" && return 0
   rvm install "$1" > >(un_ansi) 2>*1 || die "Failed to install Ruby '$version'"
   rvm use "$1" default || die "Failed to set Ruby '$version' to default"
