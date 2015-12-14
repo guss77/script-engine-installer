@@ -69,7 +69,10 @@ function install_ruby() {
   [ -x "$GPG" ] || die "Missing gpg"
   [ -x "$CURL" ] || die "Missing curl"
   if ! ($GPG --list-keys | grep -q D39DC0E3); then
-    $GPG --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3 || die "Failed to get RVM key"
+    (for i in {1..3}; do
+      $GPG --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3 && exit 0
+    done
+    exit 1) || die "Failed to get RVM key"
   fi
   if [ -d "$(rvm_base_dir)" ]; then
     $(rvm_base_dir)/bin/rvm-shell -c 'rvm get stable'
