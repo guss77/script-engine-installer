@@ -25,12 +25,15 @@ function die() {
   exit 1
 }
 
-function rvm_source_url() {
-  if [ -n "$RVM_URL" ]; then
-    echo "$RVM_URL"
-  else
-    echo "https://get.rvm.io"
-  fi
+function get_rvm_installer() {
+  local rvm_source_url=(
+    $RVM_URL
+    https://get.rvm.io
+    https://raw.githubusercontent.com/wayneeseguin/rvm/master/binscripts/rvm-installer
+    )
+  for url in "${rvm_source_url[@]}"; do
+    curl -sSL "$url" && return
+  done
 }
 
 function rvm_base_dir() {
@@ -85,7 +88,7 @@ function install_ruby() {
   if [ -d "$(rvm_base_dir)" ]; then
     $(rvm_base_dir)/bin/rvm-shell -c 'rvm get stable'
   else
-    $CURL -sL $(rvm_source_url) | bash -s -- --path "$(rvm_base_dir)" stable
+    get_rvm_installer | bash -s -- --path "$(rvm_base_dir)" stable
     all_ok "${PIPESTATUS[@]}" || die "Failed to install RVM"
   fi | un_ansi
   if [ -n "$INSTALL_CWD" ]; then
