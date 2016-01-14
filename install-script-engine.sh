@@ -84,7 +84,7 @@ function install_ruby() {
       $GPG --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3 && exit 0
     done
     # fallback to loading the key directly from rvm.io
-    curl -L https://rvm.io/mpapis.asc | gpg --import -
+    curl -L https://rvm.io/mpapis.asc | $GPG --import -
     ) || die "Failed to get RVM key"
   fi
   if [ -d "$(rvm_base_dir)" ]; then
