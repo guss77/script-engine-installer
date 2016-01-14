@@ -83,7 +83,9 @@ function install_ruby() {
     (for i in {1..3}; do
       $GPG --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3 && exit 0
     done
-    exit 1) || die "Failed to get RVM key"
+    # fallback to loading the key directly from rvm.io
+    curl -L https://rvm.io/mpapis.asc | gpg --import -
+    ) || die "Failed to get RVM key"
   fi
   if [ -d "$(rvm_base_dir)" ]; then
     $(rvm_base_dir)/bin/rvm-shell -c 'rvm get stable'
