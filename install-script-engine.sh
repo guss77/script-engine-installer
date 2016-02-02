@@ -102,6 +102,7 @@ function install_ruby() {
   rvm install "$1" > >(un_ansi) 2>*1 || die "Failed to install Ruby '$version'"
   rvm use "$1" default || die "Failed to set Ruby '$version' to default"
   add_to_path $(rvm_base_dir)/wrappers/default/*
+  rvm . do gem list bundler | grep -q bundler || rvm . do gem install bundler
 }
 
 function install_node() {
